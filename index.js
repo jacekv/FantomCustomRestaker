@@ -45,10 +45,13 @@ wallet.getAddress()
     })
     .then((pendingRewards) => {
         console.log(`Pending rewards: ${ethers.utils.formatEther(pendingRewards)} FTM`);
-        return sfcContract.getUnlockedStake(USER_ADDRESS, VALIDATOR_ID);
+        return Promise.all([
+            sfcContract.getUnlockedStake(USER_ADDRESS, VALIDATOR_ID),
+           sfcContract.getLockedStake(USER_ADDRESS, VALIDATOR_ID)
+        ]);
     })
     .then((stake) => {
-        console.log(`Currently staked: ${ethers.utils.formatEther(stake)} FTM`);
+        console.log(`Currently unlocked staked: ${ethers.utils.formatEther(stake[0].add(stake[1]))} FTM`);
         console.log(`Staking ${STAKING_AMOUNT} FTM to ${VALIDATOR_ID}`);
         return sfcContract.delegate(VALIDATOR_ID, {value: ethers.utils.parseEther(STAKING_AMOUNT)});
     })
